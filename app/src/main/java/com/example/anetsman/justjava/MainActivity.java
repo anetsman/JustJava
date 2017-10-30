@@ -8,6 +8,7 @@ package com.example.anetsman.justjava;
  */
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -43,7 +44,13 @@ public class MainActivity extends AppCompatActivity {
     public void submitOrder(View view) {
         display(currentQuantity);
         int price = calculatePrice(currentQuantity);
-        createOrderSummary(price);
+
+        Intent intent = new Intent(Intent.ACTION_SENDTO);
+        intent.putExtra(Intent.EXTRA_TEXT, createOrderSummary(price));
+        intent.putExtra(Intent.EXTRA_SUBJECT, "Order for " + getName());
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        }
     }
 
     /**
@@ -57,16 +64,17 @@ public class MainActivity extends AppCompatActivity {
     /**
      * This method creates order and print it to the screen.
      */
-    public void createOrderSummary(int price) {
-        TextView orderSummaryTextView = (TextView) findViewById(R.id.order_summary_text_view);
-        String priceOutput = String.format(
+    private String createOrderSummary(int price) {
+//        TextView orderSummaryTextView = (TextView) findViewById(R.id.order_summary_text_view);
+        return String.format(
                 "Name: %s\nQuantity: %s\nAdd whipped cream? %s\nAdd chocolate? %s\nTotal: $%s \nThank you!",
                 getName(), currentQuantity, String.valueOf(withWhippedCream), String.valueOf(withChocolate), price);
-        orderSummaryTextView.setText(priceOutput);
+//        orderSummaryTextView.setText(priceOutput);
     }
 
     /**
      * This method reads the name of user.
+     *
      * @return name
      */
     private String getName() {
@@ -118,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
         if (currentQuantity > 1) {
             display(currentQuantity - 1);
             currentQuantity -= 1;
-        } else{
+        } else {
             Context context = getApplicationContext();
             int duration = Toast.LENGTH_SHORT;
             Toast toast = Toast.makeText(context, lessThenOneCup, duration);
